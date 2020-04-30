@@ -8,7 +8,7 @@
     text-overflow: clip;
 }
 .centralizado{
-     align:center;
+    align-self: center;
     
 }
 #userImage {

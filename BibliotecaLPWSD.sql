@@ -179,5 +179,9 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
 
 USE BibliotecaLPWSD;
+
+ALTER TABLE usuario
+MODIFY COLUMN senha char(32) ;
+
 INSERT INTO Usuario (nome, tipo, email, usuario, senha) VALUES ('Administrador', '5', 'admin@admin.com', 'admin', 'admin');
 COMMIT;

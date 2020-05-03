@@ -5,6 +5,8 @@
  */
 package br.cesjf.bibliotecalpwsd.model;
 
+import br.cesjf.bibliotecalpwsd.Enum.TipoEmprestimoEnum;
+import br.cesjf.bibliotecalpwsd.strategy.TipoEmprestimo;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
@@ -120,29 +122,41 @@ public class Emprestimo implements Serializable {
         this.dataDevolucaoPrevista = dataDevolucaoPrevista;
     }
     
-    public void calculaDevolucaoPrevista() {
+    public TipoEmprestimoEnum getTipoEmprestimo(){
         Calendar c = Calendar.getInstance();
-        if(dataEmprestimo != null){
-            
-            c.setTime(dataEmprestimo);
-            
-            if(idExemplar.getCircular() && idUsuario.getTipo().equals('C')){
-                c.add(Calendar.DAY_OF_MONTH, 10);
-            } else if(idExemplar.getCircular() && !idUsuario.getTipo().equals('C')){
-                c.add(Calendar.DAY_OF_MONTH, 15);
-            } else if(!idExemplar.getCircular()) {
-                c.add(Calendar.DAY_OF_MONTH, 1);
-            }
-            
-            if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
-                c.add(Calendar.DAY_OF_MONTH, 2);
-            } else if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
-                c.add(Calendar.DAY_OF_MONTH, 1);
-            }
-        } else {
-            c.setTime(new Date());
+        TipoEmprestimoEnum tipoEmprestimoEnum = null;  
+        c.setTime(dataEmprestimo);
+
+        if(idExemplar.getCircular() && idUsuario.getTipo().equals('C')){
+            tipoEmprestimoEnum =  tipoEmprestimoEnum.CIRCULAR;
+        } else if(idExemplar.getCircular() && !idUsuario.getTipo().equals('C')){
+            tipoEmprestimoEnum =  tipoEmprestimoEnum.CIRCULAR_VIP;
+        } else if(!idExemplar.getCircular()) {
+            tipoEmprestimoEnum =  tipoEmprestimoEnum.NAO_CIRCULAR;
         }
-        dataDevolucaoPrevista = c.getTime();
+       
+        
+        return tipoEmprestimoEnum;
+    }
+    
+    public void calculaDevolucaoPrevista() {
+    Calendar c = Calendar.getInstance();
+
+    if(this.dataEmprestimo != null){
+        TipoEmprestimoEnum tipoEmprestimoEnum =  this.getTipoEmprestimo();
+
+        TipoEmprestimo tipoEmprestimo = tipoEmprestimoEnum.obterTipoEmprestimo();
+        c.setTime(tipoEmprestimo.calculaDataDevolucao(this.dataEmprestimo));
+
+        if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
+             c.add(Calendar.DAY_OF_MONTH, 2);
+        }else if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
+             c.add(Calendar.DAY_OF_MONTH, 1);
+        }
+    }else {
+        c.setTime(new Date());
+    }
+    dataDevolucaoPrevista = c.getTime();
     }
 
     @Override

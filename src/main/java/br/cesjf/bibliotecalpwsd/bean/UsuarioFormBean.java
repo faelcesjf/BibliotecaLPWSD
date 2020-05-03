@@ -7,6 +7,7 @@ package br.cesjf.bibliotecalpwsd.bean;
 
 import br.cesjf.bibliotecalpwsd.dao.UsuarioDAO;
 import br.cesjf.bibliotecalpwsd.model.Usuario;
+import br.cesjf.bibliotecalpwsd.util.CriptografiaUtil;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -54,6 +55,8 @@ public class UsuarioFormBean implements Serializable {
 
     //Métodos dos botões 
     public void record(ActionEvent actionEvent) {
+        String senhaCriptografada = CriptografiaUtil.encripta(usuario.getSenha());
+        usuario.setUsuario(senhaCriptografada);
         msgScreen(new UsuarioDAO().persistir(usuario));
     }
     

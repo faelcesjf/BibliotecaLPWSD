@@ -5,7 +5,9 @@
  */
 package br.cesjf.bibliotecalpwsd.model;
 
+import br.cesjf.bibliotecalpwsd.Enum.DiaSemanaEnum;
 import br.cesjf.bibliotecalpwsd.Enum.TipoEmprestimoEnum;
+import br.cesjf.bibliotecalpwsd.strategy.DiaSemanaStrategy;
 import br.cesjf.bibliotecalpwsd.strategy.TipoEmprestimo;
 import java.io.Serializable;
 import java.util.Calendar;
@@ -126,13 +128,13 @@ public class Emprestimo implements Serializable {
         Calendar c = Calendar.getInstance();
         TipoEmprestimoEnum tipoEmprestimoEnum = null;  
         c.setTime(dataEmprestimo);
-
-        if(idExemplar.getCircular() && idUsuario.getTipo().equals('C')){
-            tipoEmprestimoEnum =  tipoEmprestimoEnum.CIRCULAR;
-        } else if(idExemplar.getCircular() && !idUsuario.getTipo().equals('C')){
-            tipoEmprestimoEnum =  tipoEmprestimoEnum.CIRCULAR_VIP;
-        } else if(!idExemplar.getCircular()) {
+        if(!idExemplar.getCircular()) {
             tipoEmprestimoEnum =  tipoEmprestimoEnum.NAO_CIRCULAR;
+        }
+        else if(idUsuario.getTipo().equals('C')){
+            tipoEmprestimoEnum =  tipoEmprestimoEnum.CIRCULAR;
+        } else{
+            tipoEmprestimoEnum =  tipoEmprestimoEnum.CIRCULAR_VIP;
         }
        
         
@@ -144,15 +146,16 @@ public class Emprestimo implements Serializable {
 
     if(this.dataEmprestimo != null){
         TipoEmprestimoEnum tipoEmprestimoEnum =  this.getTipoEmprestimo();
-
+        
         TipoEmprestimo tipoEmprestimo = tipoEmprestimoEnum.obterTipoEmprestimo();
         c.setTime(tipoEmprestimo.calculaDataDevolucao(this.dataEmprestimo));
+        
+        
+        DiaSemanaEnum diaSemanaEnum = DiaSemanaEnum.values()[Calendar.DAY_OF_WEEK - 1 ];
+        
+        DiaSemanaStrategy diaSemanaStrategy = diaSemanaEnum.obterDiaSemana();
+        c.add(Calendar.DAY_OF_MONTH, diaSemanaStrategy.addDias() );
 
-        if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY){
-             c.add(Calendar.DAY_OF_MONTH, 2);
-        }else if(c.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
-             c.add(Calendar.DAY_OF_MONTH, 1);
-        }
     }else {
         c.setTime(new Date());
     }
